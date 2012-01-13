@@ -200,7 +200,8 @@ presentation.each do |presentation, data| #sunumu hazzırla
       end
     end
 
-    task :run => [:build, :view]
+    task :run => [:build, :view] # build ve view görevlerini çalıştır
+
 
     task :clean do
       rm_f data[:target]
@@ -209,14 +210,14 @@ presentation.each do |presentation, data| #sunumu hazzırla
 
     task :default => :build
   end
-
+#ns tablosuna verilen görevleri ata
   ns.tasks.map(&:to_s).each do |t|
     _, _, name = t.partition(":").map(&:to_sym)
     next unless tasktab[name]
     tasktab[name][:tasks] << t
   end
 end
-
+#tablodaki her eleman için görevleri yap
 namespace :p do
   tasktab.each do |name, info|
     desc info[:desc]
@@ -224,13 +225,13 @@ namespace :p do
     task name[0] => name
   end
 
-  task :build do
+  task :build do 
     index = YAML.load_file(INDEX_FILE) || {}
     presentations = presentation.values.select { |v| v[:public] }.map { |v| v[:directory] }.sort
-    unless index and presentations == index['presentations']
+    unless index and presentations == index['presentations'] #kosul sağlanmazsa
       index['presentations'] = presentations
       File.open(INDEX_FILE, 'w') do |f|
-        f.write(index.to_yaml)
+        f.write(index.to_yaml) #indeksi yaz
         f.write("---\n")
       end
     end
