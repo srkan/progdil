@@ -19,12 +19,12 @@ TASKS = {
     :optim   => 'resimleri iyileştir',
     :default => 'öntanımlı görev',
 }
-
-presentation   = {}
+#komutlar ve yaptıkları tanımlanır
+presentation   = {} #ilklendirme
 tag            = {}
 
 class File
-  @@absolute_path_here = Pathname.new(Pathname.pwd)
+  @@absolute_path_here = Pathname.new(Pathname.pwd) #dosya yolunu değişkene ata
   def self.to_herepath(path)
     Pathname.new(File.expand_path(path)).relative_path_from(@@absolute_path_here).to_s
   end
