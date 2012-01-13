@@ -1,15 +1,15 @@
-require 'pathname'
+require 'pathname' #modüllerin import edilmesi
 require 'pythonconfig'
 require 'yaml'
-# DENEME
-CONFIG = Config.fetch('presentation', {})
 
-PRESENTATION_DIR = CONFIG.fetch('directory', 'p')
+CONFIG = Config.fetch('presentation', {}) #presentation verisini istiyoruz
+
+PRESENTATION_DIR = CONFIG.fetch('directory', 'p') #directory naahtarını istiyoruz
 DEFAULT_CONFFILE = CONFIG.fetch('conffile', '_templates/presentation.cfg')
-INDEX_FILE = File.join(PRESENTATION_DIR, 'index.html')
-IMAGE_GEOMETRY = [ 733, 550 ]
-DEPEND_KEYS    = %w(source css js)
-DEPEND_ALWAYS  = %w(media)
+INDEX_FILE = File.join(PRESENTATION_DIR, 'index.html') #PRESENTATION_DIR ile index.html yi birleştir
+IMAGE_GEOMETRY = [ 733, 550 ] #resim boyutlarını belirle
+DEPEND_KEYS    = %w(source css js) #bağımlı anahtar atanır
+DEPEND_ALWAYS  = %w(media) #sürekli bağımlılar %w ile komutun parantez içindekileri dizi haline çevrilir.
 TASKS = {
     :index   => 'sunumları indeksle',
     :build   => 'sunumları oluştur',
