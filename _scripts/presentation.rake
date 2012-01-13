@@ -236,7 +236,7 @@ namespace :p do
       end
     end
   end
-
+#sunum seçimi ve diğer özelliklerin ayarlanması
   desc "sunum menüsü"
   task :menu do
     lookup = Hash[
@@ -259,7 +259,7 @@ namespace :p do
   end
   task :m => :menu
 end
-
+#presantation un p iletisiyle çalışması sağlanır
 desc "sunum menüsü"
 task :p => ["p:menu"]
 task :presentation => :p
