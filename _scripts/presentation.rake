@@ -28,32 +28,32 @@ class File
   def self.to_herepath(path)
     Pathname.new(File.expand_path(path)).relative_path_from(@@absolute_path_here).to_s
   end
-  def self.to_filelist(path)
+  def self.to_filelist(path) #dosya yolunun kontrolü
     File.directory?(path) ?
-      FileList[File.join(path, '*')].select { |f| File.file?(f) } :
+      FileList[File.join(path, '*')].select { |f| File.file?(f) } : #split edilip listeye eklenmesi
       [path]
   end
 end
 
-def png_comment(file, string)
+def png_comment(file, string) #fotoğrafların commentlenmesi
   require 'chunky_png'
   require 'oily_png'
 
-  image = ChunkyPNG::Image.from_file(file)
-  image.metadata['Comment'] = 'raked'
-  image.save(file)
+  image = ChunkyPNG::Image.from_file(file) #resmi al
+  image.metadata['Comment'] = 'raked' #resimi biçimlendir
+  image.save(file) #kaydet
 end
 
-def png_optim(file, threshold=40000)
-  return if File.new(file).size < threshold
-  sh "pngnq -f -e .png-nq #{file}"
-  out = "#{file}-nq"
-  if File.exist?(out)
-    $?.success? ? File.rename(out, file) : File.delete(out)
+def png_optim(file, threshold=40000) #fotoğrafları optimize et
+  return if File.new(file).size < threshold #boyutu verilen dosyadan küçük olanları işleme al
+  sh "pngnq -f -e .png-nq #{file}" #optimize et
+  out = "#{file}-nq" #nq uzantılı dosyaları out değişkenine kaydet
+  if File.exist?(out) #nq uzantılı dosya  varmı kontrol et
+    $?.success? ? File.rename(out, file) : File.delete(out) #dosyadan nq kısmını sil,yeniden isimlendir
   end
   png_comment(file, 'raked')
 end
-
+#png fonksiyonlarının optimizasyonunu yapan kısım 
 def jpg_optim(file)
   sh "jpegoptim -q -m80 #{file}"
   sh "mogrify -comment 'raked' #{file}"
