@@ -55,22 +55,22 @@ def png_optim(file, threshold=40000) #fotoğrafları optimize et
 end
 #png fonksiyonlarının optimizasyonunu yapan kısım 
 def jpg_optim(file)
-  sh "jpegoptim -q -m80 #{file}"
-  sh "mogrify -comment 'raked' #{file}"
+  sh "jpegoptim -q -m80 #{file}" #sh komutlarıyla optimize et
+  sh "mogrify -comment 'raked' #{file}" #sh komutlarıyla açıkla
 end
 
 def optim
   pngs, jpgs = FileList["**/*.png"], FileList["**/*.jpg", "**/*.jpeg"]
 
   [pngs, jpgs].each do |a|
-    a.reject! { |f| %x{identify -format '%c' #{f}} =~ /[Rr]aked/ }
+    a.reject! { |f| %x{identify -format '%c' #{f}} =~ /[Rr]aked/ } #resimleri çıkış formatına göre al
   end
 
   (pngs + jpgs).each do |f|
     w, h = %x{identify -format '%[fx:w] %[fx:h]' #{f}}.split.map { |e| e.to_i }
     size, i = [w, h].each_with_index.max
-    if size > IMAGE_GEOMETRY[i]
-      arg = (i > 0 ? 'x' : '') + IMAGE_GEOMETRY[i].to_s
+    if size > IMAGE_GEOMETRY[i] #boyut kontrolü yap
+      arg = (i > 0 ? 'x' : '') + IMAGE_GEOMETRY[i].to_s #boyut büyükse yeniden boyutlandırma yap
       sh "mogrify -resize #{arg} #{f}"
     end
   end
@@ -86,9 +86,9 @@ def optim
   end
 end
 
-default_conffile = File.expand_path(DEFAULT_CONFFILE)
+default_conffile = File.expand_path(DEFAULT_CONFFILE) #default_conffile a DEFAULT_CONFFILE i ata
 
-FileList[File.join(PRESENTATION_DIR, "[^_.]*")].each do |dir|
+FileList[File.join(PRESENTATION_DIR, "[^_.]*")].each do |dir| # '. ile başlayanları birleştir
   next unless File.directory?(dir)
   chdir dir do
     name = File.basename(dir)
@@ -98,8 +98,8 @@ FileList[File.join(PRESENTATION_DIR, "[^_.]*")].each do |dir|
     end
 
     landslide = config['landslide']
-    if ! landslide
-      $stderr.puts "#{dir}: 'landslide' bölümü tanımlanmamış"
+    if ! landslide #landlide tanımlanmamışsa 
+      $stderr.puts "#{dir}: 'landslide' bölümü tanımlanmamış" #hata mesajı bas
       exit 1
     end
 
@@ -108,19 +108,19 @@ FileList[File.join(PRESENTATION_DIR, "[^_.]*")].each do |dir|
       exit 1
     end
 
-    if File.exists?('index.md')
-      base = 'index'
-      ispublic = true
-    elsif File.exists?('presentation.md')
+    if File.exists?('index.md') #index.md var ise
+      base = 'index' 
+      ispublic = true #public yap
+    elsif File.exists?('presentation.md') #presentation var ise
       base = 'presentation'
-      ispublic = false
+      ispublic = false #public yapma
     else
-      $stderr.puts "#{dir}: sunum kaynağı 'presentation.md' veya 'index.md' olmalı"
+      $stderr.puts "#{dir}: sunum kaynağı 'presentation.md' veya 'index.md' olmalı" #hata mesajını bas
       exit 1
     end
 
     basename = base + '.html'
-    thumbnail = File.to_herepath(base + '.png')
+    thumbnail = File.to_herepath(base + '.png') #küçük resim oluştur
     target = File.to_herepath(basename)
 
     deps = []
@@ -148,7 +148,7 @@ FileList[File.join(PRESENTATION_DIR, "[^_.]*")].each do |dir|
   end
 end
 
-presentation.each do |k, v|
+presentation.each do |k, v| #etiketleme yap
   v[:tags].each do |t|
     tag[t] ||= []
     tag[t] << k
@@ -157,11 +157,11 @@ end
 
 tasktab = Hash[*TASKS.map { |k, v| [k, { :desc => v, :tasks => [] }] }.flatten]
 
-presentation.each do |presentation, data|
+presentation.each do |presentation, data| #sunumu hazzırla
   ns = namespace presentation do
     file data[:target] => data[:deps] do |t|
       chdir presentation do
-        sh "landslide -i #{data[:conffile]}"
+        sh "landslide -i #{data[:conffile]}" #shell ile 'landslide -i' komutuyla sunumu başlat
         sh 'sed -i -e "s/^\([[:blank:]]*var hiddenContext = \)false\(;[[:blank:]]*$\)/\1true\2/" presentation.html'
         unless data[:basename] == 'presentation.html'
           mv 'presentation.html', data[:basename]
@@ -169,8 +169,8 @@ presentation.each do |presentation, data|
       end
     end
 
-    file data[:thumbnail] => data[:target] do
-      next unless data[:public]
+    file data[:thumbnail] => data[:target] do #küçük resmi hedef yap
+      next unless data[:public] # sonraki gelen public değilse
       sh "cutycapt " +
           "--url=file://#{File.absolute_path(data[:target])}#slide1 " +
           "--out=#{data[:thumbnail]} " +
@@ -178,7 +178,7 @@ presentation.each do |presentation, data|
           "--min-width=1024 " +
           "--min-height=768 " +
           "--delay=1000"
-      sh "mogrify -resize 240 #{data[:thumbnail]}"
+      sh "mogrify -resize 240 #{data[:thumbnail]}" #sh de  değişikliği yap
       png_optim(data[:thumbnail])
     end
 
