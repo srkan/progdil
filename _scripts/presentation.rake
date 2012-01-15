@@ -155,9 +155,9 @@ presentation.each do |k, v| #etiketleme yap
   end
 end
 
-tasktab = Hash[*TASKS.map { |k, v| [k, { :desc => v, :tasks => [] }] }.flatten]
+tasktab = Hash[*TASKS.map { |k, v| [k, { :desc => v, :tasks => [] }] }.flatten] #yapılacakların hazırlanması
 
-presentation.each do |presentation, data| #sunumu hazzırla
+presentation.each do |presentation, data| #sunumu hazırla
   ns = namespace presentation do
     file data[:target] => data[:deps] do |t|
       chdir presentation do
@@ -190,9 +190,9 @@ presentation.each do |presentation, data| #sunumu hazzırla
 
     task :index => data[:thumbnail]
 
-    task :build => [:optim, data[:target], :index]
+    task :build => [:optim, data[:target], :index] #optim olarak belirlenen bagımlılıkların çalışması
 
-    task :view do
+    task :view do #dosya oluşturulması
       if File.exists?(data[:target])
         sh "touch #{data[:directory]}; #{browse_command data[:target]}"
       else
@@ -203,12 +203,12 @@ presentation.each do |presentation, data| #sunumu hazzırla
     task :run => [:build, :view] # build ve view görevlerini çalıştır
 
 
-    task :clean do
+    task :clean do #işlevi biten kısımlar temizlenir
       rm_f data[:target]
       rm_f data[:thumbnail]
     end
 
-    task :default => :build
+    task :default => :build #inşa işleminin gerçekleşmesi
   end
 #ns tablosuna verilen görevleri ata
   ns.tasks.map(&:to_s).each do |t|
